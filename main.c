@@ -52,15 +52,28 @@ char match_result;
 
 
 };
+
+struct container
+{
+    int id;
+    int id_count;
+    char name[10];
+
+};
+
+
+
+
 void initialize_match_stats(struct match_played mp[],int size);
 void initialize_player_stats(struct team tm[],int size);
 void insert_player_data(struct team tm[],int size);
 void insert_data(struct match_played mp[],struct team tm[],int size_1,int size_2);
 void display_team_stats(struct team tm[],int size);
 void display_match_stats(struct match_played mp[],int size);
-
 void calculate_highest_average(struct team tm[],int size);
 void difference_in_wickets(struct match_played mp[],struct team tm[],int size_1,int size_2);
+void print_sorted_output(struct container p[],int size);
+void man_of_the_match_array_create(struct match_played mp[],struct team tm[],int size);
 
 int main()
 {
@@ -85,6 +98,8 @@ int main()
 
   calculate_highest_average(tm,n);
   difference_in_wickets(mp,tm,sz,n);
+
+   man_of_the_match_array_create(mp,tm,sz);
 
 
 }
@@ -132,7 +147,7 @@ void initialize_match_stats(struct match_played mp[],int size)
 void initialize_player_stats(struct team tm[],int size)
 {
 
-       int i,j,id=1;
+       int i,j,id=0;
 
              for(i=0;i<size;i++)
              {
@@ -237,8 +252,8 @@ void insert_data(struct match_played mp[],struct team tm[],int size_1,int size_2
          printf("player_id:%d\n",tm[a-1].p[j].player_id);
 
 
-         printf("present match score\n");
-         scanf("%d",&tm[a-1].p[j].present_match_score);
+        printf("present match score\n");
+        scanf("%d",&tm[a-1].p[j].present_match_score);
 
          printf("present match wickets\n");
          scanf("%d",&tm[a-1].p[j].present_match_wicket);
@@ -268,6 +283,9 @@ void insert_data(struct match_played mp[],struct team tm[],int size_1,int size_2
 
         printf("MATCH RESULT\n");
         scanf(" %c",&mp[i].match_result);
+
+        printf("MAN OF THE MATCH\n");
+        scanf("%d",&mp[i].man_of_the_match);
 
 
 
@@ -351,7 +369,7 @@ void display_match_stats(struct match_played mp[],int size)
 void calculate_highest_average(struct team tm[],int size)
 {
 
-    int i,j,maxavg,id;
+    int i,j,maxavg=0,id;
 
     for(i=0;i<size;i++)
     {
@@ -385,21 +403,21 @@ void difference_in_wickets(struct match_played mp[],struct team tm[],int size_1,
    int total_wickets_taken_by_pacers=0,total_wickets=0,wickets_difference;
 
 
-   for(i=0;i<size_1;i++)
-   {
-       total_wickets_taken_by_pacers += mp[i].wickets_taken_by_pacer;
-
-   }
-
-   for(i=0;i<size_2;i++)
-   {
-
-       for(j=0;j<TEAM_SIZE;j++)
+       for(i=0;i<size_1;i++)
        {
-           total_wickets+=tm[i].p[j].previous_total_wickets;
+           total_wickets_taken_by_pacers += mp[i].wickets_taken_by_pacer;
+
        }
 
-   }
+       for(i=0;i<size_2;i++)
+       {
+
+           for(j=0;j<TEAM_SIZE;j++)
+           {
+               total_wickets+=tm[i].p[j].previous_total_wickets;
+           }
+
+       }
 
 
     wickets_difference=2*total_wickets_taken_by_pacers-total_wickets;
@@ -412,6 +430,128 @@ void difference_in_wickets(struct match_played mp[],struct team tm[],int size_1,
 
 
 
+
+
+void man_of_the_match_array_create(struct match_played mp[],struct team tm[],int size)
+{
+    int i,j,id_size,k=1,flag,team_pos,player_pos;
+    struct container man_of_match[size];
+
+    for(i=0;i<size;i++)
+    {
+        man_of_match[i].id_count=0;
+    }
+
+
+
+        man_of_match[0].id=mp[0].man_of_the_match;
+        team_pos=man_of_match[0].id/TEAM_SIZE;
+        player_pos=man_of_match[0].id%TEAM_SIZE;
+        strcpy(man_of_match[0].name,tm[team_pos].p[player_pos].player_name);
+        man_of_match[0].id_count++;
+
+    for(i=1;i<size;i++)
+    {
+
+        flag=0;
+
+        for(j=0;j<k;j++)
+        {
+            if(man_of_match[j].id==mp[i].man_of_the_match)
+            {
+               man_of_match[j].id_count++;
+               flag=1;
+            }
+
+        }
+
+
+        if(flag==0)
+        {
+
+            man_of_match[k].id=mp[i].man_of_the_match;
+            team_pos=man_of_match[k].id/TEAM_SIZE;
+            player_pos=man_of_match[k].id%TEAM_SIZE;
+            strcpy(man_of_match[k].name,tm[team_pos].p[player_pos].player_name);
+            man_of_match[k].id_count++;
+            k++;
+
+        }
+
+
+
+    }
+
+
+
+  print_sorted_output(man_of_match,k);
+
+}
+
+
+void print_sorted_output(struct container p[],int size)
+{
+
+    int i,flag=1,k=0,maxcount;
+
+     maxcount=p[0].id_count;
+
+     for(i=0;i<size;i++)
+     {
+         if(p[i].id_count>maxcount)
+         {
+            maxcount=p[i].id_count;
+         }
+
+     }
+
+
+
+
+     while(flag!=0)
+     {
+
+
+       int max=p[0].id_count;
+       int maxpos=0;
+
+       for(i=0;i<size;i++)
+       {
+               if(p[i].id_count>max)
+               {
+                   max=p[i].id_count;
+                   maxpos=i;
+               }
+
+               else if(p[i].id_count==max)
+               {
+
+                       if(strcmp(p[i].name,p[maxpos].name)<0)
+                       {
+                           maxpos=i;
+                       }
+
+               }
+
+
+        }
+
+
+        if(p[maxpos].id_count==maxcount)
+        {
+           printf("%d \n",p[maxpos].id);
+        }
+        else
+        {
+            flag=0;
+        }
+
+        p[maxpos].id_count=-1;
+
+   }
+
+
+}
 
 
 
