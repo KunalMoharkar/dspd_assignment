@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define TEAM_SIZE 5
+#define TEAM_SIZE 15
 #define NO_OF_PLAYING_TEAMS 2
 
 
@@ -42,18 +42,13 @@ struct teams_played{
 }tp;
 
 int highest_run;
-
 int wickets_taken_by_pacer;
-
 int man_of_the_match;
-
 char match_result;
-
-
 
 };
 
-struct container
+struct container    //structure for solving
 {
     int id;
     int id_count;
@@ -61,6 +56,15 @@ struct container
 
 };
 
+struct container_1 //structure for solving
+{
+
+    int id;
+    int century;
+    char name[10];
+
+
+};
 
 
 
@@ -74,6 +78,8 @@ void calculate_highest_average(struct team tm[],int size);
 void difference_in_wickets(struct match_played mp[],struct team tm[],int size_1,int size_2);
 void print_sorted_output(struct container p[],int size);
 void man_of_the_match_array_create(struct match_played mp[],struct team tm[],int size);
+void man_of_the_match_array_create_1(struct container p[],struct team tm[],int size);
+void calculate_highest_individual_run_getter(struct match_played mp[],struct team tm[],int size_1,int size_2);
 
 int main()
 {
@@ -82,7 +88,7 @@ int main()
    scanf("%d",&n);
 
    struct team tm[n];
-   int sz=3;
+   int sz=(n/2)*((n)/2-1)+3;
    struct match_played mp[sz];
 
 
@@ -96,10 +102,13 @@ int main()
   display_team_stats(tm,n);
   display_match_stats(mp,sz);
 
+  calculate_highest_individual_run_getter(mp,tm,sz,n);
+
   calculate_highest_average(tm,n);
   difference_in_wickets(mp,tm,sz,n);
 
    man_of_the_match_array_create(mp,tm,sz);
+
 
 
 }
@@ -256,7 +265,7 @@ void insert_data(struct match_played mp[],struct team tm[],int size_1,int size_2
         scanf("%d",&tm[a-1].p[j].present_match_score);
 
          printf("present match wickets\n");
-         scanf("%d",&tm[a-1].p[j].present_match_wicket);
+        scanf("%d",&tm[a-1].p[j].present_match_wicket);
 
 
 
@@ -486,6 +495,8 @@ void man_of_the_match_array_create(struct match_played mp[],struct team tm[],int
 
   print_sorted_output(man_of_match,k);
 
+  man_of_the_match_array_create_1(man_of_match,tm,k);
+
 }
 
 
@@ -553,6 +564,160 @@ void print_sorted_output(struct container p[],int size)
 
 }
 
+void man_of_the_match_array_create_1(struct container p[],struct team tm[],int size)
+{
+    int i,j,k,index=0;
+    struct container_1 q[size];
+
+    printf("ENTER THE VALUE OF K \n");
+    scanf("%d",&k);
+
+    for(i=0;i<size;i++)
+    {
+        if(p[i].id_count>=k)
+        {
+            q[index].id=p[i].id;
+            q[index].century=tm[p[i].id/TEAM_SIZE].p[p[i].id%TEAM_SIZE].century;
+            strcpy(q[index].name,p[i].name);
+
+            index++;
+        }
+
+
+    }
+
+  print_sorted_output(q,index);
+
+}
+
+void calculate_highest_individual_run_getter(struct match_played mp[],struct team tm[],int size_1,int size_2)
+{
+
+    int i,j,k,pos;
+    int runs[TEAM_SIZE*size_2];
+
+    for(i=0;i<TEAM_SIZE*size_2;i++)
+    {
+
+        runs[i]=0;
+    }
+
+    for(i=0;i<size_1-3;i++)
+    {
+        for(k=0;k<NO_OF_PLAYING_TEAMS;k++)
+        {
+
+
+                for(j=0;j<TEAM_SIZE;j++)
+                {
+
+                     pos=mp[i].tp.playing_team[k].p[j].player_id;
+                     runs[pos]+=mp[i].tp.playing_team[k].p[j].present_match_score;
+
+                }
+
+
+        }
+
+
+
+    }
+
+
+    int maxruns=runs[0],maxpos=0,flag=1,team_pos,player_pos,max;
+
+
+    for(i=0;i<size_2*TEAM_SIZE;i++)
+    {
+
+        if(runs[i]>maxruns)
+        {
+            maxruns=runs[i];
+
+        }
+
+    }
+
+
+
+    while(flag!=0)
+    {
+
+       max=runs[0];
+       maxpos=0;
+
+
+
+    for(i=0;i<size_2*TEAM_SIZE;i++)
+    {
+
+      if(runs[i]>max)
+      {
+
+          max=runs[i];
+          maxpos=i;
+
+      }
+
+       else if(runs[i]==max)
+       {
+           team_pos=i/TEAM_SIZE;
+           player_pos=i%TEAM_SIZE;
+
+           if(tm[team_pos].p[player_pos].previous_total_score>tm[maxpos/TEAM_SIZE].p[maxpos%TEAM_SIZE].previous_total_score)
+           {
+
+               maxpos=i;
+           }
+
+           else if(tm[team_pos].p[player_pos].previous_total_score==tm[maxpos/TEAM_SIZE].p[maxpos%TEAM_SIZE].previous_total_score)
+           {
+
+                 team_pos=i/TEAM_SIZE;
+                 player_pos=i%TEAM_SIZE;
+
+
+
+
+               if((strcmp(tm[team_pos].p[player_pos].player_name,tm[maxpos/TEAM_SIZE].p[maxpos%TEAM_SIZE].player_name)<0))
+               {
+                  maxpos=i;
+
+               }
+
+           }
+
+       }
+
+
+    }
+
+
+
+
+      if(runs[maxpos]==maxruns)
+        {
+           printf("%d \n",maxpos);
+        }
+        else
+        {
+            flag=0;
+        }
+
+        runs[maxpos]=-1;
+
+
+    }
+
+
+
+
+
+
+
+
+
+}
 
 
 
