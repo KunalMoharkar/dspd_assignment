@@ -66,6 +66,11 @@ struct container_1 //structure for solving
 
 };
 
+int check_1[100];
+int check_2[100];      //globals for check equal
+int check_1_size=0;
+int check_2_size=0;
+
 
 
 void initialize_match_stats(struct match_played mp[],int size);
@@ -80,6 +85,8 @@ void print_sorted_output(struct container p[],int size);
 void man_of_the_match_array_create(struct match_played mp[],struct team tm[],int size);
 void man_of_the_match_array_create_1(struct container p[],struct team tm[],int size);
 void calculate_highest_individual_run_getter(struct match_played mp[],struct team tm[],int size_1,int size_2);
+void check_is_equal();
+void player_combinations(struct team t[],int size);
 
 int main()
 {
@@ -108,6 +115,9 @@ int main()
   difference_in_wickets(mp,tm,sz,n);
 
    man_of_the_match_array_create(mp,tm,sz);
+
+   check_is_equal();
+   player_combinations(tm,n);
 
 
 
@@ -720,6 +730,280 @@ void calculate_highest_individual_run_getter(struct match_played mp[],struct tea
 }
 
 
+void player_combinations(struct team t[],int size)
+{
 
+
+
+        int batsman_size;
+        int batsman[TEAM_SIZE];
+        int bowler_size;
+        int bowler[TEAM_SIZE];
+        int allrounder_size;
+        int allrounder[TEAM_SIZE];
+
+
+
+
+    int i,j,k,m=0,player_pos,l;
+    int bat[2],bowl[2],arr[11];
+
+
+
+
+
+
+
+    for(i=0;i<size;i++)                //classify all players
+    {
+        batsman_size=0;
+        bowler_size=0;
+        allrounder_size=0;
+         m=0;
+
+        for(j=0;j<TEAM_SIZE;j++)
+        {
+               if(t[i].p[j].player_role=='B')
+               {
+
+                   batsman[batsman_size]=t[i].p[j].player_id;
+                   batsman_size++;
+               }
+
+                else if(t[i].p[j].player_role=='b')
+                {
+                    bowler[bowler_size]=t[i].p[j].player_id;
+                    bowler_size++;
+
+                }
+                else
+                {
+                    allrounder[allrounder_size]=t[i].p[j].player_id;
+                    allrounder_size++;
+                }
+
+        }
+
+
+          while(m<2)
+          {
+                 int max=-1,maxpos=0;
+
+                 for(k=0;k<batsman_size;k++)
+                 {
+                     player_pos=batsman[k]%TEAM_SIZE;
+
+                        if(t[i].p[player_pos].previous_total_score>max)
+                        {
+                            max=t[i].p[player_pos].previous_total_score;
+                            maxpos=batsman[k];
+                        }
+                        else if(t[i].p[player_pos].previous_total_score==max)
+                        {
+                                    if(t[i].p[player_pos].previous_avg>t[i].p[maxpos%TEAM_SIZE].previous_avg)
+                                    {
+                                        maxpos=batsman[k];
+
+                                    }
+
+                        }
+
+
+
+                }
+
+                      bat[m]=maxpos;
+                      t[i].p[maxpos%TEAM_SIZE].previous_total_score=-1;
+
+    //for bowlers
+
+                    max=-1,maxpos=0;
+
+                 for(k=0;k<bowler_size;k++)
+                 {
+                     player_pos=bowler[k]%TEAM_SIZE;
+
+                        if(t[i].p[player_pos].previous_total_wickets>max)
+                        {
+                            max=t[i].p[player_pos].previous_total_wickets;
+                            maxpos=bowler[k];
+                        }
+                        else if(t[i].p[player_pos].previous_total_wickets==max)
+                        {
+                                    if(t[i].p[player_pos].previous_avg>t[i].p[maxpos%TEAM_SIZE].previous_avg)
+                                    {
+                                        maxpos=bowler[k];
+                                    }
+
+                        }
+
+
+
+                    }
+
+                      bowl[m]=maxpos;
+                      t[i].p[maxpos%TEAM_SIZE].previous_total_wickets=-1;
+                      m++;
+
+
+                }
+
+                 //regroup back all players
+
+                  k=0;
+                  for(l=0;l<batsman_size;l++)
+                  {
+
+
+                      if(batsman[l]!=bat[0]&&batsman[l]!=bat[1])
+                       {
+                           arr[k]=batsman[l];
+                           k++;
+                       }
+
+
+                  }
+
+                  for(l=0;l<bowler_size;l++)
+                  {
+
+
+                      if(bowler[l]!=bowl[0]&&bowler[l]!=bowl[1])
+                       {
+                           arr[k]=bowler[l];
+                           k++;
+                       }
+
+
+                  }
+
+                   for(l=0;l<allrounder_size;l++)
+                  {
+                           arr[k]=allrounder[l];
+                           k++;
+
+                  }
+
+
+                  int a,b,c,d,e,f,g;
+
+                  printf("%d %d %d %d",bat[0],bat[1],bowl[0],bowl[1]);
+                  printf("\n");
+
+
+            for(a=0;a<=4;a++)   //printing permutations
+            {
+
+
+                for(b=a+1;b<=5;b++)
+                {
+
+                  for(c=b+1;c<=6;c++)
+                  {
+
+                      for(d=c+1;d<=7;d++)
+                      {
+
+                          for(e=d+1;e<=8;e++)
+                          {
+
+                              for(f=e+1;f<=9;f++)
+                              {
+                                  for(g=f+1;g<=10;g++)
+                                  {
+
+                                      printf("%d %d %d %d",bat[0],bat[1],bowl[0],bowl[1]);
+                                      printf("\n");
+                                      printf("%d %d %d %d %d %d %d",arr[a],arr[b],arr[c],arr[d],arr[e],arr[f],arr[g]);
+                                      printf("\n\n");
+                                  }
+
+
+                              }
+
+
+
+                          }
+
+
+
+
+                      }
+
+
+
+                  }
+
+
+               }
+
+            }
+
+
+
+
+
+
+
+
+
+       printf("-----------------------------------------------------------------------------/n/n/n");
+
+
+
+
+
+
+
+
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+}
+
+void check_is_equal()
+{
+    int i,flag=1;
+
+    if(check_1_size==check_2_size)
+    {
+
+            for(i=0;i<check_1_size;i++)
+            {
+                if(check_1[i]!=check_2[i])
+                {
+                    flag=0;
+                }
+
+            }
+
+    }
+    else
+        {
+           flag=0;
+        }
+
+
+    if(flag==1)
+    {
+        printf("THE RESULTS ARE EQUAL \n\n");
+    }
+    else
+    {
+        printf("THE RESULTS ARE NOT EQUAL\n\n");
+    }
+
+
+}
 
 
