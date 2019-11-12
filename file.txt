@@ -1,0 +1,20 @@
+#!/bin/bash
+
+filename=$1
+echo $filename
+num=$2
+while read line;
+do
+    
+       var=$(echo $line | awk '{print $3}')
+       echo $var
+       
+
+         if[$var == $num]
+         then
+              echo "valid"
+
+        fi
+
+
+done < $filename
