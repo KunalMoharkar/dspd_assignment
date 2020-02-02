@@ -2,8 +2,7 @@
 
 filename=$1
 roll=$2
-while IFS= read -r line
-do
+
   
    var=$( echo $line | cut -d " " -f 1 )
    var1=$( echo $line | cut -d " " -f 2 )
